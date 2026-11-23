@@ -1,0 +1,32 @@
+name: FRC Snippet Check
+description: Find removed or deprecated WPILib Java APIs in Markdown code examples.
+branding:
+  icon: check-circle
+  color: blue
+inputs:
+  paths:
+    description: Space-separated files or folders to scan
+    default: "."
+  only-tagged:
+    description: Only check code blocks tagged `frc-check` (true/false)
+    default: "false"
+  fail-on:
+    description: error, warning or never
+    default: "error"
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - shell: bash
+      env:
+        PYTHONPATH: ${{ github.action_path }}
+        FSC_PATHS: ${{ inputs.paths }}
+        FSC_FAIL_ON: ${{ inputs.fail-on }}
+        FSC_ONLY_TAGGED: ${{ inputs.only-tagged }}
+      run: |
+        args=(--format github --fail-on "$FSC_FAIL_ON")
+        [ "$FSC_ONLY_TAGGED" = "true" ] && args+=(--only-tagged)
+        # shellcheck disable=SC2086
+        python -m frc_snippet_check "${args[@]}" $FSC_PATHS

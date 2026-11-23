@@ -1,0 +1,124 @@
+{
+  "_comment": "Patterns for WPILib Java APIs that were removed, moved or deprecated. Each rule is checked line by line against Java code blocks in Markdown. Verify against the WPILib release notes before relying on a rule; corrections welcome.",
+  "rules": [
+    {
+      "id": "old-command-framework",
+      "severity": "error",
+      "pattern": "\\bedu\\.wpi\\.first\\.wpilibj\\.command\\.",
+      "message": "Old command-based framework (edu.wpi.first.wpilibj.command) is no longer shipped with WPILib.",
+      "fix": "Use the current framework in edu.wpi.first.wpilibj2.command."
+    },
+    {
+      "id": "old-trigger-bindings",
+      "severity": "error",
+      "pattern": "\\.(whenPressed|whenReleased|whileHeld|whenHeld|toggleWhenPressed|cancelWhenPressed|whenActive|whileActiveContinuous|whileActiveOnce|whenInactive|toggleWhenActive|cancelWhenActive)\\s*\\(",
+      "message": "Old Button/Trigger binding method was removed from WPILib.",
+      "fix": "Use onTrue / onFalse / whileTrue / whileFalse / toggleOnTrue."
+    },
+    {
+      "id": "command-group-base",
+      "severity": "error",
+      "pattern": "\\bCommandGroupBase\\b",
+      "message": "CommandGroupBase was removed.",
+      "fix": "Use Commands.sequence / Commands.parallel or SequentialCommandGroup / ParallelCommandGroup directly."
+    },
+    {
+      "id": "perpetual-command",
+      "severity": "error",
+      "pattern": "\\bPerpetualCommand\\b|\\.perpetually\\s*\\(",
+      "message": "PerpetualCommand / perpetually() was removed.",
+      "fix": "Use .repeatedly() or a command that never finishes."
+    },
+    {
+      "id": "with-interrupt",
+      "severity": "error",
+      "pattern": "\\.withInterrupt\\s*\\(",
+      "message": "withInterrupt() was removed.",
+      "fix": "Use .until(condition)."
+    },
+    {
+      "id": "speed-controller-group",
+      "severity": "error",
+      "pattern": "\\bSpeedControllerGroup\\b",
+      "message": "SpeedControllerGroup was removed.",
+      "fix": "Use motor controller followers (e.g. addFollower or vendor follow())."
+    },
+    {
+      "id": "speed-controller-interface",
+      "severity": "error",
+      "pattern": "\\bSpeedController\\b",
+      "message": "The SpeedController interface was renamed.",
+      "fix": "Use edu.wpi.first.wpilibj.motorcontrol.MotorController."
+    },
+    {
+      "id": "motor-controller-group",
+      "severity": "warning",
+      "pattern": "\\bMotorControllerGroup\\b",
+      "message": "MotorControllerGroup is deprecated.",
+      "fix": "Use motor controller followers (e.g. addFollower or vendor follow())."
+    },
+    {
+      "id": "robot-drive",
+      "severity": "error",
+      "pattern": "\\bRobotDrive\\b",
+      "message": "The old RobotDrive class was removed.",
+      "fix": "Use DifferentialDrive or MecanumDrive in edu.wpi.first.wpilibj.drive."
+    },
+    {
+      "id": "old-robot-base",
+      "severity": "error",
+      "pattern": "\\b(IterativeRobot|SampleRobot)\\b",
+      "message": "IterativeRobot / SampleRobot were removed.",
+      "fix": "Extend TimedRobot."
+    },
+    {
+      "id": "generic-hid-hand",
+      "severity": "error",
+      "pattern": "\\bGenericHID\\.Hand\\b|\\bHand\\.k(Left|Right)\\b",
+      "message": "GenericHID.Hand was removed.",
+      "fix": "Use the axis-specific methods, e.g. XboxController.getLeftY()."
+    },
+    {
+      "id": "timer-has-period-passed",
+      "severity": "error",
+      "pattern": "\\.hasPeriodPassed\\s*\\(",
+      "message": "Timer.hasPeriodPassed() was removed.",
+      "fix": "Use Timer.hasElapsed() or Timer.advanceIfElapsed()."
+    },
+    {
+      "id": "math-packages-moved",
+      "severity": "error",
+      "pattern": "\\bedu\\.wpi\\.first\\.wpilibj\\.(geometry|kinematics|trajectory|estimator|spline|system|controller)\\.",
+      "message": "Math classes moved out of edu.wpi.first.wpilibj.",
+      "fix": "Import from edu.wpi.first.math.<package> instead."
+    },
+    {
+      "id": "units-moved",
+      "severity": "error",
+      "pattern": "\\bedu\\.wpi\\.first\\.wpilibj\\.util\\.Units\\b",
+      "message": "Units moved.",
+      "fix": "Import edu.wpi.first.math.util.Units."
+    },
+    {
+      "id": "pwm-motor-controllers-moved",
+      "severity": "error",
+      "pattern": "\\bedu\\.wpi\\.first\\.wpilibj\\.(Spark|Talon|Victor|VictorSP|PWMSparkMax|PWMTalonSRX|PWMVictorSPX|PWMTalonFX|PWMVenom|Jaguar|SD540|DMC60|NidecBrushless)\\b",
+      "message": "PWM motor controller classes moved to the motorcontrol package.",
+      "fix": "Import from edu.wpi.first.wpilibj.motorcontrol."
+    },
+    {
+      "id": "sendable-moved",
+      "severity": "error",
+      "pattern": "\\bedu\\.wpi\\.first\\.wpilibj\\.(Sendable|SendableBase)\\b|\\bedu\\.wpi\\.first\\.wpilibj\\.smartdashboard\\.(SendableRegistry|SendableBuilder)\\b",
+      "message": "Sendable classes moved.",
+      "fix": "Import from edu.wpi.first.util.sendable."
+    },
+    {
+      "id": "wpiutil-package",
+      "severity": "error",
+      "pattern": "\\bedu\\.wpi\\.first\\.wpiutil\\.",
+      "message": "The edu.wpi.first.wpiutil package was renamed.",
+      "fix": "Import from edu.wpi.first.util."
+    }
+  ]
+}
