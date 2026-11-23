@@ -1,124 +1,212 @@
 {
-  "_comment": "Patterns for WPILib Java APIs that were removed, moved or deprecated. Each rule is checked line by line against Java code blocks in Markdown. Verify against the WPILib release notes before relying on a rule; corrections welcome.",
+  "_comment": "Each rule is checked line by line against Java code blocks in Markdown. A rule fires as an error when the target WPILib year >= removed_in, as a warning when >= deprecated_in. 'source' points at the WPILib yearly changelog (docs.wpilib.org, 'New for YEAR'). 'unverified' means no official source was found yet.",
   "rules": [
     {
       "id": "old-command-framework",
-      "severity": "error",
       "pattern": "\\bedu\\.wpi\\.first\\.wpilibj\\.command\\.",
-      "message": "Old command-based framework (edu.wpi.first.wpilibj.command) is no longer shipped with WPILib.",
-      "fix": "Use the current framework in edu.wpi.first.wpilibj2.command."
+      "deprecated_in": 2020,
+      "removed_in": 2023,
+      "message": "Old command-based framework (edu.wpi.first.wpilibj.command) is no longer included in WPILib.",
+      "fix": "Use the current framework in edu.wpi.first.wpilibj2.command.",
+      "source": "New for 2023: 'The 2023 release no longer includes the old command-based framework.'"
     },
     {
       "id": "old-trigger-bindings",
-      "severity": "error",
       "pattern": "\\.(whenPressed|whenReleased|whileHeld|whenHeld|toggleWhenPressed|cancelWhenPressed|whenActive|whileActiveContinuous|whileActiveOnce|whenInactive|toggleWhenActive|cancelWhenActive)\\s*\\(",
-      "message": "Old Button/Trigger binding method was removed from WPILib.",
-      "fix": "Use onTrue / onFalse / whileTrue / whileFalse / toggleOnTrue."
+      "deprecated_in": 2023,
+      "removed_in": 2024,
+      "message": "Old Button/Trigger binding method was removed.",
+      "fix": "Use onTrue / onFalse / whileTrue / whileFalse / toggleOnTrue.",
+      "source": "New for 2023 (renamed, Button deprecated); New for 2024 Breaking Changes (Button and old-style Trigger functions removed)."
+    },
+    {
+      "id": "command-base",
+      "pattern": "\\bCommandBase\\b",
+      "deprecated_in": null,
+      "removed_in": 2025,
+      "message": "CommandBase was removed.",
+      "fix": "Extend Command instead.",
+      "source": "New for 2025: 'Breaking: Remove deprecated CommandBase'."
     },
     {
       "id": "command-group-base",
-      "severity": "error",
       "pattern": "\\bCommandGroupBase\\b",
+      "deprecated_in": 2023,
+      "removed_in": 2024,
       "message": "CommandGroupBase was removed.",
-      "fix": "Use Commands.sequence / Commands.parallel or SequentialCommandGroup / ParallelCommandGroup directly."
+      "fix": "Use the static factories in Commands (sequence, parallel, ...).",
+      "source": "New for 2023 (deprecated); New for 2024 Breaking Changes (removed)."
     },
     {
       "id": "perpetual-command",
-      "severity": "error",
       "pattern": "\\bPerpetualCommand\\b|\\.perpetually\\s*\\(",
+      "deprecated_in": 2023,
+      "removed_in": 2024,
       "message": "PerpetualCommand / perpetually() was removed.",
-      "fix": "Use .repeatedly() or a command that never finishes."
+      "fix": "Use RepeatCommand / .repeatedly().",
+      "source": "New for 2023 (deprecated); New for 2024 Breaking Changes (removed)."
     },
     {
       "id": "with-interrupt",
-      "severity": "error",
       "pattern": "\\.withInterrupt\\s*\\(",
+      "deprecated_in": 2023,
+      "removed_in": 2024,
       "message": "withInterrupt() was removed.",
-      "fix": "Use .until(condition)."
+      "fix": "Use .until(condition).",
+      "source": "New for 2023 (renamed to until); New for 2024 Breaking Changes (removed)."
+    },
+    {
+      "id": "deadline-with",
+      "pattern": "\\.deadlineWith\\s*\\(",
+      "deprecated_in": 2025,
+      "removed_in": null,
+      "message": "deadlineWith() was renamed.",
+      "fix": "Use .deadlineFor().",
+      "source": "New for 2025: 'Rename deadlineWith to deadlineFor'."
+    },
+    {
+      "id": "pid-command-classes",
+      "pattern": "\\b(PIDCommand|PIDSubsystem|ProfiledPIDCommand|ProfiledPIDSubsystem|TrapezoidProfileCommand|TrapezoidProfileSubsystem)\\b",
+      "deprecated_in": 2025,
+      "removed_in": 2027,
+      "message": "PID/TrapezoidProfile command and subsystem wrappers are deprecated (removed in 2027).",
+      "fix": "Use PIDController / ProfiledPIDController / TrapezoidProfile directly in your commands or subsystems.",
+      "source": "New for 2025 (deprecated); 2027 removed-features page."
     },
     {
       "id": "speed-controller-group",
-      "severity": "error",
       "pattern": "\\bSpeedControllerGroup\\b",
+      "deprecated_in": 2022,
+      "removed_in": 2023,
       "message": "SpeedControllerGroup was removed.",
-      "fix": "Use motor controller followers (e.g. addFollower or vendor follow())."
+      "fix": "Use motor controller following (PWMMotorController.addFollower() or the vendor's follow method).",
+      "source": "New for 2023: 'Removed deprecated SpeedController and SpeedControllerGroup classes'."
     },
     {
       "id": "speed-controller-interface",
-      "severity": "error",
       "pattern": "\\bSpeedController\\b",
-      "message": "The SpeedController interface was renamed.",
-      "fix": "Use edu.wpi.first.wpilibj.motorcontrol.MotorController."
+      "deprecated_in": 2022,
+      "removed_in": 2023,
+      "message": "The SpeedController interface was removed (renamed to MotorController).",
+      "fix": "Use edu.wpi.first.wpilibj.motorcontrol.MotorController.",
+      "source": "New for 2022 (renamed); New for 2023 (removed)."
     },
     {
       "id": "motor-controller-group",
-      "severity": "warning",
       "pattern": "\\bMotorControllerGroup\\b",
-      "message": "MotorControllerGroup is deprecated.",
-      "fix": "Use motor controller followers (e.g. addFollower or vendor follow())."
+      "deprecated_in": 2024,
+      "removed_in": 2027,
+      "message": "MotorControllerGroup is deprecated (removed in 2027).",
+      "fix": "Use motor controller following (PWMMotorController.addFollower() or the vendor's follow method).",
+      "source": "New for 2024 (deprecated); 2027 changelog: 'Remove deprecated MotorControllerGroup'."
     },
     {
       "id": "robot-drive",
-      "severity": "error",
       "pattern": "\\bRobotDrive\\b",
+      "deprecated_in": null,
+      "removed_in": 2022,
       "message": "The old RobotDrive class was removed.",
-      "fix": "Use DifferentialDrive or MecanumDrive in edu.wpi.first.wpilibj.drive."
+      "fix": "Use DifferentialDrive or MecanumDrive in edu.wpi.first.wpilibj.drive.",
+      "source": "New for 2022: 'Deprecated RobotDrive has been removed'."
     },
     {
-      "id": "old-robot-base",
-      "severity": "error",
-      "pattern": "\\b(IterativeRobot|SampleRobot)\\b",
-      "message": "IterativeRobot / SampleRobot were removed.",
-      "fix": "Extend TimedRobot."
+      "id": "iterative-robot",
+      "pattern": "\\bIterativeRobot\\b",
+      "deprecated_in": null,
+      "removed_in": 2022,
+      "message": "IterativeRobot was removed.",
+      "fix": "Extend TimedRobot.",
+      "source": "New for 2022: 'IterativeRobot has been removed'."
+    },
+    {
+      "id": "sample-robot",
+      "pattern": "\\bSampleRobot\\b",
+      "deprecated_in": 2022,
+      "removed_in": null,
+      "message": "SampleRobot is an old robot base class and is not in current templates.",
+      "fix": "Extend TimedRobot.",
+      "source": "unverified"
     },
     {
       "id": "generic-hid-hand",
-      "severity": "error",
       "pattern": "\\bGenericHID\\.Hand\\b|\\bHand\\.k(Left|Right)\\b",
+      "deprecated_in": null,
+      "removed_in": 2022,
       "message": "GenericHID.Hand was removed.",
-      "fix": "Use the axis-specific methods, e.g. XboxController.getLeftY()."
+      "fix": "Use the side-specific methods, e.g. getLeftX(), getLeftTriggerAxis().",
+      "source": "New for 2022: 'controller.getX(GenericHID.Hand.kLeft) -> controller.getLeftX()'."
     },
     {
       "id": "timer-has-period-passed",
-      "severity": "error",
       "pattern": "\\.hasPeriodPassed\\s*\\(",
-      "message": "Timer.hasPeriodPassed() was removed.",
-      "fix": "Use Timer.hasElapsed() or Timer.advanceIfElapsed()."
+      "deprecated_in": 2022,
+      "removed_in": null,
+      "message": "Timer.hasPeriodPassed() is deprecated.",
+      "fix": "Use Timer.advanceIfElapsed().",
+      "source": "New for 2022: 'Timer.hasPeriodPassed() have been deprecated'."
+    },
+    {
+      "id": "gyro-interface",
+      "pattern": "\\bedu\\.wpi\\.first\\.wpilibj\\.interfaces\\.(Gyro|Accelerometer)\\b",
+      "deprecated_in": 2024,
+      "removed_in": 2025,
+      "message": "The Gyro / Accelerometer interfaces were removed.",
+      "fix": "Use the concrete gyro or accelerometer class directly.",
+      "source": "New for 2024 (deprecated); New for 2025: 'Breaking: Remove deprecated Gyro and Accelerometer interface'."
+    },
+    {
+      "id": "ramsete-controller",
+      "pattern": "\\bRamseteController\\b|\\bRamseteCommand\\b",
+      "deprecated_in": 2025,
+      "removed_in": null,
+      "message": "RamseteController is deprecated.",
+      "fix": "Use LTVUnicycleController.",
+      "source": "New for 2025: 'Deprecate RamseteController. Use LTVUnicycleController instead'."
     },
     {
       "id": "math-packages-moved",
-      "severity": "error",
-      "pattern": "\\bedu\\.wpi\\.first\\.wpilibj\\.(geometry|kinematics|trajectory|estimator|spline|system|controller)\\.",
-      "message": "Math classes moved out of edu.wpi.first.wpilibj.",
-      "fix": "Import from edu.wpi.first.math.<package> instead."
+      "pattern": "\\bedu\\.wpi\\.first\\.wpilibj\\.(controller|estimator|geometry|kinematics|math|spline|system|trajectory)\\.",
+      "deprecated_in": null,
+      "removed_in": 2022,
+      "message": "Math packages moved out of edu.wpi.first.wpilibj.",
+      "fix": "Import from edu.wpi.first.math.<package> instead.",
+      "source": "New for 2022, Package Renames: 'Several packages moved from wpilibj to math'."
     },
     {
       "id": "units-moved",
-      "severity": "error",
       "pattern": "\\bedu\\.wpi\\.first\\.wpilibj\\.util\\.Units\\b",
-      "message": "Units moved.",
-      "fix": "Import edu.wpi.first.math.util.Units."
+      "deprecated_in": 2022,
+      "removed_in": null,
+      "message": "Units is now in the math package.",
+      "fix": "Import edu.wpi.first.math.util.Units.",
+      "source": "unverified"
     },
     {
       "id": "pwm-motor-controllers-moved",
-      "severity": "error",
       "pattern": "\\bedu\\.wpi\\.first\\.wpilibj\\.(Spark|Talon|Victor|VictorSP|PWMSparkMax|PWMTalonSRX|PWMVictorSPX|PWMTalonFX|PWMVenom|Jaguar|SD540|DMC60|NidecBrushless)\\b",
-      "message": "PWM motor controller classes moved to the motorcontrol package.",
-      "fix": "Import from edu.wpi.first.wpilibj.motorcontrol."
+      "deprecated_in": null,
+      "removed_in": 2022,
+      "message": "Motor controller classes moved to the motorcontrol package.",
+      "fix": "Import from edu.wpi.first.wpilibj.motorcontrol.",
+      "source": "New for 2022, Package Renames: 'Motor controllers ... have been moved to a motorcontrol package'."
     },
     {
       "id": "sendable-moved",
-      "severity": "error",
-      "pattern": "\\bedu\\.wpi\\.first\\.wpilibj\\.(Sendable|SendableBase)\\b|\\bedu\\.wpi\\.first\\.wpilibj\\.smartdashboard\\.(SendableRegistry|SendableBuilder)\\b",
-      "message": "Sendable classes moved.",
-      "fix": "Import from edu.wpi.first.util.sendable."
+      "pattern": "\\bedu\\.wpi\\.first\\.wpilibj\\.Sendable\\b|\\bedu\\.wpi\\.first\\.wpilibj\\.smartdashboard\\.(SendableRegistry|SendableBuilder)\\b",
+      "deprecated_in": null,
+      "removed_in": 2022,
+      "message": "Sendable classes moved to wpiutil.",
+      "fix": "Import from edu.wpi.first.util.sendable.",
+      "source": "New for 2022: 'Sendable has been broken up ... non-NetworkTables components (moved to wpiutil)'."
     },
     {
       "id": "wpiutil-package",
-      "severity": "error",
       "pattern": "\\bedu\\.wpi\\.first\\.wpiutil\\.",
+      "deprecated_in": null,
+      "removed_in": 2022,
       "message": "The edu.wpi.first.wpiutil package was renamed.",
-      "fix": "Import from edu.wpi.first.util."
+      "fix": "Import from edu.wpi.first.util.",
+      "source": "New for 2022, Package Renames: 'wpiutil is now util'."
     }
   ]
 }
