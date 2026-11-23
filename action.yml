@@ -10,6 +10,9 @@ inputs:
   only-tagged:
     description: Only check code blocks tagged `frc-check` (true/false)
     default: "false"
+  target-wpilib:
+    description: WPILib season year the docs should work with
+    default: "2026"
   fail-on:
     description: error, warning or never
     default: "error"
@@ -25,8 +28,9 @@ runs:
         FSC_PATHS: ${{ inputs.paths }}
         FSC_FAIL_ON: ${{ inputs.fail-on }}
         FSC_ONLY_TAGGED: ${{ inputs.only-tagged }}
+        FSC_TARGET: ${{ inputs.target-wpilib }}
       run: |
-        args=(--format github --fail-on "$FSC_FAIL_ON")
+        args=(--format github --fail-on "$FSC_FAIL_ON" --target-wpilib "$FSC_TARGET")
         [ "$FSC_ONLY_TAGGED" = "true" ] && args+=(--only-tagged)
         # shellcheck disable=SC2086
         python -m frc_snippet_check "${args[@]}" $FSC_PATHS

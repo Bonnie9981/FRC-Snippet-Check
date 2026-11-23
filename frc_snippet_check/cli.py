@@ -45,20 +45,34 @@ class Finding:
     code: str
 
 
+DEFAULT_TARGET = 2026
+COMMENT_RE = re.compile(r"^\s*(//|/\*|\*)")
+
+
 @dataclass
 class Rule:
     id: str
-    severity: str
     pattern: re.Pattern
     message: str
     fix: str
+    deprecated_in: int | None = None
+    removed_in: int | None = None
+
+    def severity_for(self, target: int) -> str | None:
+        """error if removed by the target year, warning if only deprecated, None if still fine."""
+        if self.removed_in is not None and target >= self.removed_in:
+            return "error"
+        if self.deprecated_in is not None and target >= self.deprecated_in:
+            return "warning"
+        return None
 
 
 def load_rules(path: Path | None = None) -> list[Rule]:
     path = path or Path(__file__).with_name("rules.json")
     data = json.loads(path.read_text(encoding="utf-8"))
     return [
-        Rule(r["id"], r["severity"], re.compile(r["pattern"]), r["message"], r.get("fix", ""))
+        Rule(r["id"], re.compile(r["pattern"]), r["message"], r.get("fix", ""),
+             r.get("deprecated_in"), r.get("removed_in"))
         for r in data["rules"]
     ]
 
@@ -105,21 +119,23 @@ def iter_markdown_files(paths: list[str]):
                     yield Path(dirpath) / name
 
 
-def check_block(block: CodeBlock, rules: list[Rule]) -> list[Finding]:
+def check_block(block: CodeBlock, rules: list[Rule], target: int = DEFAULT_TARGET) -> list[Finding]:
     findings = []
     for offset, line in enumerate(block.lines):
-        if IGNORE_LINE in line:
+        if IGNORE_LINE in line or COMMENT_RE.match(line):
             continue
         for rule in rules:
-            if rule.pattern.search(line):
+            severity = rule.severity_for(target)
+            if severity and rule.pattern.search(line):
                 findings.append(
-                    Finding(block.path, block.start_line + offset, rule.id, rule.severity,
+                    Finding(block.path, block.start_line + offset, rule.id, severity,
                             rule.message, rule.fix, line.strip())
                 )
     return findings
 
 
-def scan(paths: list[str], rules: list[Rule], only_tagged: bool = False):
+def scan(paths: list[str], rules: list[Rule], only_tagged: bool = False,
+         target: int = DEFAULT_TARGET):
     files = blocks_checked = 0
     findings: list[Finding] = []
     for md in iter_markdown_files(paths):
@@ -136,7 +152,7 @@ def scan(paths: list[str], rules: list[Rule], only_tagged: bool = False):
             if only_tagged and not block.tagged:
                 continue
             blocks_checked += 1
-            findings.extend(check_block(block, rules))
+            findings.extend(check_block(block, rules, target))
     return files, blocks_checked, findings
 
 
@@ -144,9 +160,10 @@ def _gh_escape(s: str) -> str:
     return s.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
 
 
-def render(findings: list[Finding], files: int, blocks: int, fmt: str) -> str:
+def render(findings: list[Finding], files: int, blocks: int, fmt: str,
+           target: int = DEFAULT_TARGET) -> str:
     if fmt == "json":
-        return json.dumps({"files": files, "java_blocks": blocks,
+        return json.dumps({"target_wpilib": target, "files": files, "java_blocks": blocks,
                            "findings": [asdict(f) for f in findings]}, indent=2, ensure_ascii=False)
     out = []
     for f in findings:
@@ -160,7 +177,7 @@ def render(findings: list[Finding], files: int, blocks: int, fmt: str) -> str:
     errors = sum(f.severity == "error" for f in findings)
     warnings = len(findings) - errors
     out.append(f"Checked {blocks} Java code block(s) in {files} Markdown file(s): "
-               f"{errors} error(s), {warnings} warning(s).")
+               f"{errors} error(s), {warnings} warning(s) for WPILib {target}.")
     return "\n".join(out)
 
 
@@ -172,13 +189,15 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--format", choices=["text", "github", "json"], default="text")
     ap.add_argument("--fail-on", choices=["error", "warning", "never"], default="error",
                     help="Exit with status 1 when findings at this level or above exist (default: error)")
+    ap.add_argument("--target-wpilib", type=int, default=DEFAULT_TARGET, metavar="YEAR",
+                    help=f"WPILib season the docs should work with (default: {DEFAULT_TARGET})")
     ap.add_argument("--rules", type=Path, help="Use a custom rules.json")
     ap.add_argument("--version", action="version", version=__version__)
     args = ap.parse_args(argv)
 
     rules = load_rules(args.rules)
-    files, blocks, findings = scan(args.paths, rules, args.only_tagged)
-    print(render(findings, files, blocks, args.format))
+    files, blocks, findings = scan(args.paths, rules, args.only_tagged, args.target_wpilib)
+    print(render(findings, files, blocks, args.format, args.target_wpilib))
 
     if args.fail_on == "never":
         return 0
